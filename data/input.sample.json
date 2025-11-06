@@ -1,0 +1,7 @@
+{
+ "currencies": ["USD", "EUR"],
+ "page": 1,
+ "limit": 25,
+ "sort_by": "gainer_loser_24h",
+ "tag_slugs": ["decentralized_finance_defi"]
+}
