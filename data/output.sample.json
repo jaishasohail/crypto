@@ -1,0 +1,36 @@
+[
+ {
+ "id": 4140177518,
+ "name": "Bitcoin",
+ "symbol": "BTC",
+ "slug": "bitcoin",
+ "cmcRank": 1,
+ "marketPairCount": null,
+ "circulatingSupply": 19700000.0,
+ "totalSupply": 21000000.0,
+ "maxSupply": 21000000.0,
+ "ath": 0,
+ "atl": 0,
+ "high24h": 0,
+ "low24h": 0,
+ "isActive": 1,
+ "lastUpdated": "2025-06-08T15:30:00+00:00",
+ "dateAdded": null,
+ "quotes": [
+ {
+ "name": "USD",
+ "price": 0,
+ "volume24h": 0,
+ "volume7d": null,
+ "volume30d": null,
+ "marketCap": 0,
+ "percentChange1h": 0,
+ "percentChange24h": 0,
+ "percentChange7d": 0,
+ "percentChange30d": 0,
+ "percentChange60d": 0,
+ "percentChange90d": 0
+ }
+ ]
+ }
+]
