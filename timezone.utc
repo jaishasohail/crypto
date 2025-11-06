@@ -1,0 +1,100 @@
+).isoformat()
+ except Exception:
+ try:
+ return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+ tzinfo=timezone.utc
+ ).isoformat()
+ except Exception:
+ log.debug("Unrecognized datetime format: %s", dt_str)
+ return None
+
+def make_quote_payload(
+ name: str,
+ price: Any,
+ volume24h: Any,
+ market_cap: Any,
+ pct_1h: Any,
+ pct_24h: Any,
+ pct_7d: Any,
+ pct_30d: Any,
+ pct_60d: Any,
+ pct_90d: Any,
+) -> Dict[str, Any]:
+ """
+ Build the quotes object, reserving fields for volume7d/30d (not available here).
+ """
+ def _num(x):
+ try:
+ return float(x)
+ except Exception:
+ return None
+
+ return {
+ "name": str(name).upper(),
+ "price": _num(price),
+ "volume24h": _num(volume24h),
+ "volume7d": None,
+ "volume30d": None,
+ "marketCap": _num(market_cap),
+ "percentChange1h": _num(pct_1h),
+ "percentChange24h": _num(pct_24h),
+ "percentChange7d": _num(pct_7d),
+ "percentChange30d": _num(pct_30d),
+ "percentChange60d": _num(pct_60d),
+ "percentChange90d": _num(pct_90d),
+ }
+
+def sort_records(records: List[Dict[str, Any]], sort_by: Optional[str]) -> List[Dict[str, Any]]:
+ """
+ Local sorting options:
+ - rank (default): ascending by cmcRank
+ - gainer_loser_24h: descending by USD quote percentChange24h (falls back to first quote)
+ - trending_7d: descending by USD percentChange7d
+ - volume_24h: descending by USD volume24h
+ - price_desc | price_asc: by USD price
+ """
+ if not records:
+ return records
+
+ key = (sort_by or "rank").lower()
+
+ def pick_quote(rec: Dict[str, Any], currency: str = "USD") -> Dict[str, Any]:
+ for q in rec.get("quotes", []):
+ if str(q.get("name")).upper() == currency.upper():
+ return q
+ return rec.get("quotes", [{}])[0] if rec.get("quotes") else {}
+
+ if key == "rank":
+ return sorted(records, key=lambda r: (r.get("cmcRank") is None, r.get("cmcRank")))
+ elif key == "gainer_loser_24h":
+ return sorted(
+ records,
+ key=lambda r: (pick_quote(r, "USD").get("percentChange24h") or float("-inf")),
+ reverse=True,
+ )
+ elif key == "trending_7d":
+ return sorted(
+ records,
+ key=lambda r: (pick_quote(r, "USD").get("percentChange7d") or float("-inf")),
+ reverse=True,
+ )
+ elif key == "volume_24h":
+ return sorted(
+ records,
+ key=lambda r: (pick_quote(r, "USD").get("volume24h") or float("-inf")),
+ reverse=True,
+ )
+ elif key == "price_desc":
+ return sorted(
+ records,
+ key=lambda r: (pick_quote(r, "USD").get("price") or float("-inf")),
+ reverse=True,
+ )
+ elif key == "price_asc":
+ return sorted(
+ records,
+ key=lambda r: (pick_quote(r, "USD").get("price") or float("inf")),
+ )
+ else:
+ log.warning("Unknown sort_by=%s. Defaulting to rank.", sort_by)
+ return sorted(records, key=lambda r: (r.get("cmcRank") is None, r.get("cmcRank")))
