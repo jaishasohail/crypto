@@ -1,0 +1,10 @@
+{
+ "currencies": ["USD", "BTC", "ETH"],
+ "page": 1,
+ "limit": 50,
+ "sort_by": "rank",
+ "tag_slugs": [],
+ "audited_only": false,
+ "timeout": 25,
+ "output": "data/output.sample.json"
+}
